@@ -1,14 +1,16 @@
 "use client";
 
-import axios from "axios";
+import { signIn } from "next-auth/react";
 import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
+
 import useRegisterModal from "@/app/hooks/useRegisterModal";
+import useLoginModal from "@/app/hooks/useLoginModal";
 import useUserMenu from "@/app/hooks/useUserMenu";
+
 import { useStore } from "zustand";
-import { signIn } from "next-auth/react";
 
 import Modal from "./Modal";
 import Button from "../Button";
@@ -17,10 +19,12 @@ import Input from "../inputs/Input";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
-const RegisterModal = () => {
-  // const { isOpen, onClose, onOpen } = useStore(useRegisterModal);
-  const { toggleMenu } = useStore(useUserMenu);
+const LoginModal = () => {
+  const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
+
+  // const { isOpen, onClose, onOpen } = useStore(useLoginModal);
+  const { toggleMenu } = useStore(useUserMenu);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const {
@@ -29,36 +33,39 @@ const RegisterModal = () => {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      name: "",
       email: "",
       password: "",
     },
   });
 
   const submitHandler = async (data) => {
-    setIsLoading(true);
-
     try {
-      const response = await axios.post("/api/register", data);
+      const callback = await signIn("credentials", {
+        ...data,
+        redirect: false,
+      });
+      setIsLoading(false);
 
-      if (response.status >= 200 && response.status < 300) {
-        toast.success("Your account successfully registered!");
-        registerModal.onClose();
+      if (callback?.ok) {
+        toast.success("Logged in");
+        router.refresh();
+        loginModal.onClose();
+      }
 
-        router.push("/");
+      if (callback?.error) {
+        toast.error(callback.error);
       }
     } catch (error) {
-      toast.error("Something went wrong");
-      console.log(`error: ${error}`);
-    } finally {
-      setIsLoading(false);
+      console.error(error);
     }
   };
 
   const bodyContent = (
     <div className="flex flex-col  gap-4 ">
-      <h1 className="text-2xl font-bold">Welcome to Airbnb</h1>
-      <p className="text-neutral-500 font-light text-sm">Create an account!</p>
+      <h1 className="text-2xl font-bold">Welcome back</h1>
+      <p className="text-neutral-500 font-light text-sm">
+        Login to your account!
+      </p>
 
       <Input
         type="email"
@@ -66,14 +73,6 @@ const RegisterModal = () => {
         label="Email"
         name="email"
         errors={errors.email}
-        register={register}
-      />
-      <Input
-        type="text"
-        id="name"
-        label="Name"
-        name="name"
-        errors={errors.name}
         register={register}
       />
       <Input
@@ -108,7 +107,7 @@ const RegisterModal = () => {
           Already have an account?{" "}
           <Link
             href="/register"
-            onClick={() => registerModal.onClose()}
+            onClick={() => loginModal.onClose()}
             className="font-semibold text-neutral-800 hover:underline cursor-pointer">
             Log in
           </Link>
@@ -123,14 +122,14 @@ const RegisterModal = () => {
         disabled={isLoading}
         body={bodyContent}
         footer={footerContent}
-        title="Register"
+        title="Login"
         actionLabel="Continue"
-        isOpen={registerModal.isOpen}
-        onClose={registerModal.onClose}
+        isOpen={loginModal.isOpen}
+        onClose={loginModal.onClose}
         onSubmit={handleSubmit(submitHandler)}
       />
     </div>
   );
 };
 
-export default RegisterModal;
+export default LoginModal;

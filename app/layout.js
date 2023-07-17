@@ -2,7 +2,11 @@ import { Nunito } from "next/font/google";
 const font = Nunito({ subsets: ["latin"] });
 import Navbar from "./components/navbar/Navbar";
 import RegisterModal from "./components/modals/RegisterModal";
+import LoginModal from "./components/modals/LoginModal";
 import ToasterProvider from "./ToasterProvider";
+import getCurrentUser from "./actions/getCurrentUser";
+import ClientOnly from "./components/ClientOnly";
+import Provider from "./components/Provider";
 
 import "./globals.css";
 
@@ -11,14 +15,22 @@ export const metadata = {
   description: "A clone of Airbnb using Next.js and MongoDB",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
+  const currentUser = await getCurrentUser();
+  console.log(currentUser);
+
   return (
     <html lang="en">
       <body className={font.className}>
-        <ToasterProvider />
-        <Navbar />
-        <RegisterModal />
-        <div className="pb-20 pt-28">{children}</div>
+        <Provider>
+          <ClientOnly>
+            <ToasterProvider />
+            <Navbar currentUser={currentUser} />
+            <LoginModal />
+            <RegisterModal />
+          </ClientOnly>
+          <div className="pb-20 pt-28">{children}</div>
+        </Provider>
       </body>
     </html>
   );

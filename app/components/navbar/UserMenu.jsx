@@ -7,11 +7,16 @@ import Avatar from "./Avatar";
 import MenuItem from "./MenuItem";
 import { signOut } from "next-auth/react";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
+import useLoginModal from "@/app/hooks/useLoginModal";
+import useUserMenu from "@/app/hooks/useUserMenu";
 import { useStore } from "zustand";
 
-const UserMenu = () => {
-  const { isOpen, onClose, onOpen } = useStore(useRegisterModal);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+const UserMenu = ({ currentUser }) => {
+  // const { isOpen, onClose, onOpen } = useStore(useRegisterModal);
+  const loginModal = useLoginModal();
+  const registerModal = useRegisterModal();
+  const { isMenuOpen, toggleMenu } = useStore(useUserMenu);
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
@@ -21,7 +26,7 @@ const UserMenu = () => {
         <p className="hidden md:block  font-semibold">Airbnb your home</p>
         <div
           className="p-4 md:px-2 md:py-1 flex justify-center items-center gap-3 rounded-full border cursor-pointer hover:shadow-md transition"
-          onClick={() => setIsMenuOpen((prev) => !prev)}>
+          onClick={() => toggleMenu(isMenuOpen)}>
           <AiOutlineMenu />
           <Avatar />
         </div>
@@ -31,14 +36,22 @@ const UserMenu = () => {
           className="absolute text-sm top-12 right-0 bg-white border rounded-xl  py-1 shadow-md w-[40vw]
             md:w-[85%] overflow-hidden ">
           <div className="flex flex-col justify-center">
-            {!isLoggedIn ? (
+            {!currentUser ? (
               <>
                 <MenuItem
                   item="Sign Up"
-                  onClick={() => onOpen()}
-                  link="/signup"
+                  onClick={() => {
+                    registerModal.onOpen();
+                    toggleMenu(isMenuOpen);
+                  }}
                 />
-                <MenuItem item="Login" link="/trips" onClick={() => {}} />
+                <MenuItem
+                  item="Login"
+                  onClick={() => {
+                    loginModal.onOpen();
+                    toggleMenu(isMenuOpen);
+                  }}
+                />
                 <hr />
                 <MenuItem
                   item="Airbnb your home"

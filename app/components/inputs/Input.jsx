@@ -1,10 +1,11 @@
 "use client";
 import { FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
 
-const Input = ({ id, type, register, label, formatPrice, errors }) => {
+const Input = ({ name, id, type, register, label, formatPrice, errors }) => {
   return (
     <div className="w-full relative">
       <input
+        name={name}
         id={id}
         type={type}
         {...register(id, { required: true })}

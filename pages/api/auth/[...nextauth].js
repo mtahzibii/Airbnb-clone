@@ -6,12 +6,12 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/app/libs/prismadb";
 
-const authOptions = {
+export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GithubProvider({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -46,20 +46,53 @@ const authOptions = {
         if (!isCorrectPassword) {
           throw new Error("Invalid credentials");
         }
-
         return user;
       },
     }),
   ],
+  //   callbacks: {
+  //     async session({ session }) {
+  //       try {
+  //         const user = await prisma.user.findUnique({
+  //           where: {
+  //             email: session.user.email,
+  //           },
+  //         });
 
+  //         if (user) {
+  //           session.user.id = user.id.toString();
+  //           return session;
+  //         }
+  //       } catch (error) {
+  //         console.log("Error fetching user: ", error.message);
+  //       }
+  //     },
+  //     async signIn({ profile }) {
+  //       try {
+  //         const currentUser = await prisma.user.findUnique({
+  //           where: {
+  //             email: profile.email,
+  //           },
+  //         });
+  //         console.log(currentUser);
+  //         if (currentUser) {
+  //           return true;
+  //         }
+  //       } catch (error) {
+  //         console.log("Error checking if user exists: ", error.message);
+  //         return false;
+  //       }
+  //     },
+  //   },
   pages: {
     signIn: "/",
   },
-  debug: process.env.NODE_ENV === "development",
+  // debug: process.env.NODE_ENV === "development",
   session: {
     strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
-
+// const handler = NextAuth(authOptions);
+// export { handler as GET, handler as POST };
 export default NextAuth(authOptions);
