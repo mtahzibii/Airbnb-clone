@@ -1,5 +1,6 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import axios from "axios";
 import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
@@ -8,7 +9,6 @@ import { useForm } from "react-hook-form";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useUserMenu from "@/app/hooks/useUserMenu";
 import { useStore } from "zustand";
-import { signIn } from "next-auth/react";
 
 import Modal from "./Modal";
 import Button from "../Button";

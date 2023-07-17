@@ -10,8 +10,10 @@ import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
 import useUserMenu from "@/app/hooks/useUserMenu";
 import { useStore } from "zustand";
+import Image from "next/image";
 
 const UserMenu = ({ currentUser }) => {
+  console.log(currentUser);
   // const { isOpen, onClose, onOpen } = useStore(useRegisterModal);
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
@@ -28,7 +30,7 @@ const UserMenu = ({ currentUser }) => {
           className="p-4 md:px-2 md:py-1 flex justify-center items-center gap-3 rounded-full border cursor-pointer hover:shadow-md transition"
           onClick={() => toggleMenu(isMenuOpen)}>
           <AiOutlineMenu />
-          <Avatar />
+          <Avatar avatarImg={currentUser?.image} />
         </div>
       </div>
       {isMenuOpen && (
