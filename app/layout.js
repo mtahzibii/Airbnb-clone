@@ -17,7 +17,6 @@ export const metadata = {
 
 export default async function RootLayout({ children }) {
   const currentUser = await getCurrentUser();
-  console.log(currentUser);
 
   return (
     <html lang="en">
@@ -29,7 +28,7 @@ export default async function RootLayout({ children }) {
             <LoginModal />
             <RegisterModal />
           </ClientOnly>
-          <div className="pb-20 pt-28">{children}</div>
+          <div className="mt-6">{children}</div>
         </Provider>
       </body>
     </html>
